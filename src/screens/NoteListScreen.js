@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { TouchableOpacity, StyleSheet, View, Text } from 'react-native';
 import { Icon } from 'react-native-elements';
 import realm from '../../store/realm';
+import { FlatList } from 'react-native';
 
 const NoteListScreen = (props) => {
     const { navigation } = props;
@@ -21,18 +22,44 @@ const NoteListScreen = (props) => {
     };
 
     useEffect(() => {
-        
-        // Pastikan realm sudah diinisialisasi dengan schema
-        const notes = realm.objects('Note');
-        const notesByDate = notes.sorted('date', true);
-        setData(notesByDate);
-    }, []);
+    const noteListPage = navigation.addListener('focus', () => {
+      const notes = realm.objects('Note');
+      const notesByDate = notes.sorted('date', true); 
+      setData(notesByDate);
+    });
+
+    return noteListPage; 
+  }, [navigation]);
 
     return (
         <View style={styles.mainContainer}>
             <View style={styles.headerContainer}>
                 <Text style={styles.headerTitle}>Notes</Text>
             </View>
+
+            <FlatList
+                contentContainerStyle={styles.flatListContainer}
+                data={data}
+                keyExtractor={(item) => item.id.toString()}
+                renderItem={({ item }) => {
+                    return (
+                        <View style={styles.mainDataContainer}>
+                            <TouchableOpacity style={styles.noteButton}>
+                                <View style={styles.noteContainer}>
+                                    <Text style={styles.noteText}>
+                                        {item.note}
+                                    </Text>
+                                </View>
+                                <Text style={styles.dateText}>
+                                    {dateFormat(item.date)}
+                                </Text>
+                            </TouchableOpacity>
+                        </View>
+                    );
+                }}
+            />
+
+
             <View style={styles.buttonContainer}>
                 <TouchableOpacity
                     style={styles.addButton}
@@ -59,7 +86,7 @@ const styles = StyleSheet.create({
         padding: 8,
         backgroundColor: 'moccasin',
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
     },
     headerTitle: {
         fontSize: 20,
@@ -75,7 +102,35 @@ const styles = StyleSheet.create({
         backgroundColor: 'pink',
         padding: 16,
         borderRadius: 100,
+    },
+    flatListContainer: {
+        padding : 8,
+    },
+    mainDataContainer: {
+        margin : 8,
+        backgroundColor : 'whitesmoke',
+        borderRadius : 10,
+        flex : 1,
+        flexDirection: 'row',
+        alignItems : 'center',
+        justifyContent: 'space-between',
+    },
+    noteButton: {
+        flex : 1,
+        padding : 8,
+        margin : 8,
+    },
+    noteContainer: {
+        maxHeight : 40,
+        paddingBottom : 10,
+    },
+    noteText: {
+        textAlign: 'justify',
+    },
+    dateText: {
+        fontSize: 12,
     }
+
 });
 
 export default NoteListScreen;
