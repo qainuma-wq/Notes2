@@ -3,10 +3,9 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-nativ
 import { Icon } from 'react-native-elements';
 import realm from '../../store/realm';
 
-const saveNote = (newNote) => {
-  const allData = realm.objects('Note');
-  const dataLength = allData.length;
-  let lastIdFromRealm = 0;
+function getCurrentDate() {
+  const noteDate = new Date(); 
+  return noteDate.toLocaleDateString('id-ID');
 
   if (dataLength !== 0) {
     lastIdFromRealm = allData[dataLength - 1].id;
@@ -46,7 +45,11 @@ const AddNoteScreen = (props) => {
           <Icon name="check" type="font-awesome-5" size={18} />
         </TouchableOpacity>
       </View>
-      <Text style={styles.date}>Date</Text>
+      
+      {/* <Text style={styles.date}>Date</Text> */}
+
+      <Text style={styles.date}>{getCurrentDate()}</Text>
+      
       <TextInput
         multiline
         placeholder="Write here"
